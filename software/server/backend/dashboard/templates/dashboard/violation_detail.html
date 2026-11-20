@@ -1,0 +1,149 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% blocktranslate with pk=violation.pk %}Violation #{{ pk }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="crumbs"><a href="{% url 'dashboard:violation_list' %}">{% translate "Violations" %}</a> / #{{ violation.pk }}</div>
+    <h1>{{ violation.get_category_display }} <span class="muted" style="font-weight:500">{% blocktranslate with place=violation.node.name|default:violation.node.code %}at {{ place }}{% endblocktranslate %}</span></h1>
+    <p><span class="badge {{ violation.status|tone }}">{{ violation.get_status_display }}</span></p>
+  </div>
+  <div class="btn-row">
+    {% if violation.status != 'resolved' and violation.status != 'rejected' %}
+      <form method="post" action="{% url 'dashboard:violation_resolve' violation.pk %}" data-confirm="{% translate 'Mark this violation as removed?' %}">
+        {% csrf_token %}<button class="btn" type="submit">{% translate "Mark as removed" %}</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+
+<div class="grid grid-main">
+  <div class="stack">
+    <div class="card">
+      {% if selected %}
+        {% include 'dashboard/partials/viewer.html' %}
+        <div class="small muted" style="margin-top:8px">
+          <a href="{% url 'dashboard:capture_detail' selected.pk %}">{% blocktranslate with seq=selected.sequence %}Image #{{ seq }}{% endblocktranslate %}</a> · {{ selected.captured_at|date:'DATETIME_FORMAT' }}
+        </div>
+        {% if captures|length > 1 %}
+          <div class="strip">
+            {% for c in captures %}
+              <a href="?capture={{ c.pk }}" class="{% if c.pk == selected.pk %}active{% endif %}" title="{{ c.captured_at|date:'SHORT_DATETIME_FORMAT' }}">
+                <img src="{% if c.redacted_image %}{{ c.redacted_image.url }}{% else %}{{ c.image.url }}{% endif %}" alt="">
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="empty">{% translate "No images are linked to this violation." %}</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Review history" %}</h2></div>
+      <ul class="timeline">
+        {% for r in reviews %}
+          <li>
+            <span class="badge {% if r.decision == 'confirm' %}danger{% else %}muted{% endif %}">{{ r.get_decision_display }}</span>
+            <div>
+              <b>{% if r.reviewer %}{{ r.reviewer.get_full_name|default:r.reviewer.username }}{% else %}—{% endif %}</b>
+              {% if r.impact_score is not None %} · {% translate "score" %} <span class="num">{{ r.impact_score|floatformat:0 }}</span>{% endif %}
+              {% if r.notes %}<div>{{ r.notes }}</div>{% endif %}
+              <div class="when">{{ r.created_at|date:'DATETIME_FORMAT' }}</div>
+            </div>
+          </li>
+        {% empty %}
+          <li class="muted small">{% translate "Not reviewed yet." %}</li>
+        {% endfor %}
+        {% if violation.notes %}
+          <li><span class="badge">{% translate "Notes" %}</span><div style="white-space:pre-line">{{ violation.notes }}</div></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="card">
+      <div class="card-head">
+        <h2>{% translate "Impact score" %}</h2>
+        <span class="score {{ violation.impact_score|score_tone }}" style="font-size:1.2rem;height:36px;min-width:56px">{{ violation.impact_score|floatformat:0|default:'—' }}</span>
+      </div>
+      <dl class="facts">
+        <dt>{% translate "Node" %}</dt><dd><a href="{% url 'dashboard:node_detail' violation.node.pk %}">{{ violation.node }}</a></dd>
+        <dt>{% translate "First seen" %}</dt><dd>{{ violation.first_seen_at|date:'DATETIME_FORMAT' }}</dd>
+        <dt>{% translate "Last sighting" %}</dt><dd>{{ violation.last_seen_at|date:'DATETIME_FORMAT' }}</dd>
+        <dt>{% translate "Duration" %}</dt><dd>{{ violation.duration|duration }}</dd>
+        <dt>{% translate "Sightings" %}</dt><dd class="num">{{ violation.repeat_count }}</dd>
+        <dt>{% translate "Occupancy" %}</dt><dd>{{ violation.occupancy_ratio|pct }}</dd>
+        <dt>{% translate "Blocked width" %}</dt><dd>{% if violation.blocked_width_m is not None %}{% if violation.zone.sidewalk_width_m %}{% blocktranslate with blocked=violation.blocked_width_m|floatformat:1 total=violation.zone.sidewalk_width_m|floatformat:1 %}{{ blocked }} m of {{ total }} m{% endblocktranslate %}{% else %}{% blocktranslate with value=violation.blocked_width_m|floatformat:1 %}{{ value }} m{% endblocktranslate %}{% endif %}{% else %}—{% endif %}</dd>
+        <dt>{% translate "Recorded by" %}</dt><dd>{{ violation.created_by.username|default:_("System") }}</dd>
+      </dl>
+      <p class="small muted" style="margin:12px 0 0">{% translate "Score out of 100: blocked width 50, duration 30 (full at 8 hours), repeats 20. A reviewer's score replaces the computed one." %}</p>
+    </div>
+
+    {% if violation.status == 'detected' or violation.status == 'confirmed' %}
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Review" %}</h2>{% if violation.status == 'confirmed' %}<span class="hint">{% translate "The decision can be changed" %}</span>{% endif %}</div>
+      <form method="post" action="{% url 'dashboard:violation_review' violation.pk %}" class="form-grid">
+        {% csrf_token %}
+        <div class="field radio-cards">{{ review_form.decision }}</div>
+        <div class="field">
+          <label for="{{ review_form.impact_score.id_for_label }}">{{ review_form.impact_score.label }}</label>
+          {{ review_form.impact_score }}
+        </div>
+        <div class="field">
+          <label for="{{ review_form.notes.id_for_label }}">{{ review_form.notes.label }}</label>
+          {{ review_form.notes }}
+        </div>
+        <button class="btn primary" type="submit">{% translate "Save review" %}</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Alert the inspectors" %}</h2></div>
+      {% if violation.status == 'confirmed' %}
+        <pre class="alert-text" id="alert-text" dir="rtl" lang="ar">{{ alert_text }}</pre>
+        <div class="btn-row" style="margin-bottom:14px">
+          <button class="btn small" type="button" data-copy="#alert-text" data-copied="{% translate 'Copied ✓' %}">{% translate "Copy text" %}</button>
+          <a class="btn small whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">{% translate "Open in WhatsApp" %}</a>
+        </div>
+        <form method="post" action="{% url 'dashboard:violation_alert' violation.pk %}" class="btn-row">
+          {% csrf_token %}
+          <div class="field" style="flex:1;min-width:120px">{{ alert_form.channel }}</div>
+          <button class="btn primary" type="submit">{% translate "Record as sent" %}</button>
+        </form>
+        <p class="small muted" style="margin:8px 0 0">{% translate "Send the text, then record it to start the 48-hour clock. The text is always in Arabic for the Directorate." %}</p>
+      {% else %}
+        <p class="small muted" style="margin:0">{% translate "Alerts are available once the violation is confirmed." %}</p>
+      {% endif %}
+
+      {% if alerts %}
+        <hr style="border:0;border-top:1px solid var(--border);margin:16px 0">
+        <ul class="timeline">
+          {% for a in alerts %}
+            <li style="flex-direction:column;gap:6px">
+              <div>
+                <span class="badge {{ a.response|tone }}">{{ a.get_response_display }}</span>
+                <span class="small muted">{{ a.get_channel_display }} · {{ a.sent_at|date:'SHORT_DATETIME_FORMAT' }}</span>
+                {% if a.responded_within_48h %}<span class="badge ok">{% translate "Within 48 h" %}</span>{% endif %}
+              </div>
+              <form method="post" action="{% url 'dashboard:alert_response' a.pk %}" class="btn-row">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <select name="response" style="flex:1;min-width:140px">
+                  {% for value, label in response_choices %}<option value="{{ value }}"{% if value == a.response %} selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                <input type="hidden" name="notes" value="{{ a.response_notes }}">
+                <button class="btn small" type="submit">{% translate "Update" %}</button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% load static i18n %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% translate "Dashboard" %}{% endblock %} · Damascus Eye</title>
+  <script>
+    // Apply the saved theme before first paint, so there is no flash.
+    try { var t = localStorage.getItem('theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'dashboard/app.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{% block body %}
+{% with name=request.resolver_match.url_name %}
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" href="{% url 'dashboard:overview' %}">
+      <span class="brand-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <span>
+        <span class="brand-name">Damascus Eye</span><br>
+        <span class="brand-sub">{% translate "Sidewalk encroachment monitoring" %}</span>
+      </span>
+    </a>
+
+    <nav class="nav">
+      <a href="{% url 'dashboard:overview' %}" class="{% if name == 'overview' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+        <span class="label">{% translate "Overview" %}</span>
+      </a>
+      <a href="{% url 'dashboard:violation_list' %}" class="{% if 'violation' in name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+        <span class="label">{% translate "Violations" %}</span>
+        {% if nav_awaiting_review %}<span class="count" title="{% translate 'Awaiting review' %}">{{ nav_awaiting_review }}</span>{% endif %}
+      </a>
+      <a href="{% url 'dashboard:capture_list' %}" class="{% if 'capture' in name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span class="label">{% translate "Images & detection" %}</span>
+      </a>
+      <a href="{% url 'dashboard:node_list' %}" class="{% if 'node' in name or 'zone' in name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
+        <span class="label">{% translate "Nodes" %}</span>
+      </a>
+      <a href="{% url 'dashboard:alert_list' %}" class="{% if 'alert' in name %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="label">{% translate "Alerts" %}</span>
+        {% if nav_alerts_open %}<span class="count" title="{% translate 'Awaiting inspector response' %}">{{ nav_alerts_open }}</span>{% endif %}
+      </a>
+      <a href="{% url 'dashboard:hotspots' %}" class="{% if name == 'hotspots' %}active{% endif %}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="label">{% translate "Hotspots" %}</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">
+      {% include 'dashboard/partials/preferences.html' %}
+      <div class="who-row">
+        <span class="who">{{ request.user.get_full_name|default:request.user.username }}</span>
+        {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">{% translate "Admin" %}</a>{% endif %}
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn small" type="submit">{% translate "Log out" %}</button></form>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    {% if messages %}
+      <ul class="messages">{% for message in messages %}<li class="{{ message.tags }}">{{ message }}</li>{% endfor %}</ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endwith %}
+{% endblock %}
+<script src="{% static 'dashboard/app.js' %}" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

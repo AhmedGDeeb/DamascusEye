@@ -1,0 +1,8 @@
+{% load i18n dashboard_tags %}
+{% if page.paginator.num_pages > 1 %}
+<nav class="pagination" aria-label="{% translate 'Pages' %}">
+  {% if page.has_previous %}<a class="btn small" href="{% query page=page.previous_page_number %}">{% translate "Previous" %}</a>{% endif %}
+  <span class="muted">{% blocktranslate with number=page.number total=page.paginator.num_pages %}Page {{ number }} of {{ total }}{% endblocktranslate %}</span>
+  {% if page.has_next %}<a class="btn small" href="{% query page=page.next_page_number %}">{% translate "Next" %}</a>{% endif %}
+</nav>
+{% endif %}

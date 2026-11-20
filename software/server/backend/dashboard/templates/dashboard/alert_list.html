@@ -1,0 +1,75 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% translate "Alerts" %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Alerts and inspector responses" %}</h1>
+    <p>{% translate "Record the inspectors' response to each alert; these numbers decide whether the pilot continues, adjusts or stops." %}</p>
+  </div>
+</div>
+
+<div class="grid grid-2" style="margin-bottom:16px">
+  <div class="card">
+    <div class="card-head"><h2>{% translate "Pilot decision" %}</h2><span class="hint">{% translate "Last 14 days" %}</span></div>
+    {% include 'dashboard/partials/metrics.html' %}
+  </div>
+  <div class="card">
+    <div class="card-head"><h2>{% translate "Since the start" %}</h2></div>
+    <dl class="facts">
+      <dt>{% translate "All alerts" %}</dt><dd class="num">{{ metrics_all.alerts_total }}</dd>
+      <dt>{% translate "Answered within 48 h" %}</dt><dd class="num">{{ metrics_all.responded_within_48h }} ({{ metrics_all.response_rate|pct }})</dd>
+      <dt>{% translate "Led to action" %}</dt><dd class="num">{{ metrics_all.acted }} ({{ metrics_all.action_rate|pct }})</dd>
+      <dt>{% translate "No response yet" %}</dt><dd class="num">{{ nav_alerts_open|default:0 }}</dd>
+    </dl>
+    <p class="small muted" style="margin:14px 0 0">{% translate "“Led to action” means the Directorate dispatched an inspector or the encroachment was removed. An acknowledgement alone does not count." %}</p>
+  </div>
+</div>
+
+<form class="filters" method="get" data-autosubmit>
+  <div class="field">
+    <label for="f-response">{% translate "Response" %}</label>
+    <select name="response" id="f-response">
+      <option value="">{% translate "All responses" %}</option>
+      {% for value, label in responses %}<option value="{{ value }}"{% if value == response %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <noscript><button class="btn" type="submit">{% translate "Filter" %}</button></noscript>
+</form>
+
+<div class="card flush">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>{% translate "Violation" %}</th><th>{% translate "Node" %}</th><th>{% translate "Sent" %}</th><th>{% translate "Response" %}</th><th>{% translate "Within 48 h" %}</th><th>{% translate "Update response" %}</th></tr></thead>
+      <tbody>
+      {% for a in page %}
+        <tr>
+          <td class="nowrap"><a href="{% url 'dashboard:violation_detail' a.violation.pk %}">{{ a.violation.get_category_display }} #{{ a.violation.pk }}</a></td>
+          <td class="nowrap">{{ a.violation.node.code }}</td>
+          <td class="small nowrap">{{ a.sent_at|date:'SHORT_DATETIME_FORMAT' }}<div class="muted">{{ a.get_channel_display }}{% if a.sent_by %} · {{ a.sent_by.username }}{% endif %}</div></td>
+          <td class="nowrap"><span class="badge {{ a.response|tone }}">{{ a.get_response_display }}</span>
+            {% if a.responded_at %}<div class="small muted">{% blocktranslate with delay=a.sent_at|timesince:a.responded_at %}after {{ delay }}{% endblocktranslate %}</div>{% endif %}</td>
+          <td>{% if a.responded_within_48h %}<span class="badge ok">{% translate "Yes" %}</span>{% elif a.response == 'none' %}<span class="small muted">—</span>{% else %}<span class="badge danger">{% translate "No" %}</span>{% endif %}</td>
+          <td>
+            <form method="post" action="{% url 'dashboard:alert_response' a.pk %}" class="btn-row" style="flex-wrap:nowrap">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <select name="response" style="width:170px">
+                {% for value, label in responses %}<option value="{{ value }}"{% if value == a.response %} selected{% endif %}>{{ label }}</option>{% endfor %}
+              </select>
+              <input type="text" name="notes" value="{{ a.response_notes }}" placeholder="{% translate 'Note' %}" style="width:160px">
+              <button class="btn small" type="submit">{% translate "Save" %}</button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="empty">{% translate "No alerts sent yet. Confirm a violation, then record the alert from its page." %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% include 'dashboard/partials/pagination.html' %}
+{% endblock %}

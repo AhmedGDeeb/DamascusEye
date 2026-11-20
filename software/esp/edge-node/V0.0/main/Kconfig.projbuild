@@ -1,0 +1,91 @@
+menu "ESP32-CAM Capture Settings"
+
+    config CAPTURE_INTERVAL_SEC
+        int "Capture interval (seconds)"
+        default 60
+        range 5 86400
+
+    config PIXEL_DIFF_THRESHOLD
+        int "Per-pixel difference threshold (0-255)"
+        default 25
+        range 1 255
+        help
+            A thumbnail pixel counts as "changed" when its brightness differs
+            by more than this value (after compensating global brightness drift).
+
+    config CHANGE_PERCENT_X10
+        int "Changed area needed to keep image (percent x10)"
+        default 20
+        range 1 1000
+        help
+            20 = 2.0% of the thumbnail pixels must change for the new image to be kept.
+
+    config DEVICE_ID
+        string "Device ID"
+        default "esp32cam-01"
+
+    choice CAM_WIFI_MODE
+        prompt "WiFi mode"
+        default CAM_WIFI_AP
+        help
+            AP: the board creates its own WiFi network; connect a phone/PC to it
+            and open http://192.168.4.1/ to see the kept images (no router needed,
+            no internet, no upload, time is not synced).
+            STA: the board joins an existing network (router / hotspot); needed for upload.
+
+        config CAM_WIFI_AP
+            bool "Create its own WiFi network (test without router)"
+        config CAM_WIFI_STA
+            bool "Connect to an existing WiFi network"
+    endchoice
+
+    config AP_SSID
+        string "Own network name (SSID)"
+        default "EdgeNode-CAM"
+        depends on CAM_WIFI_AP
+
+    config AP_PASSWORD
+        string "Own network password (8+ chars, empty = open)"
+        default "12345678"
+        depends on CAM_WIFI_AP
+
+    config WIFI_SSID
+        string "WiFi SSID"
+        default "myssid"
+        depends on CAM_WIFI_STA
+
+    config WIFI_PASSWORD
+        string "WiFi Password"
+        default "mypassword"
+        depends on CAM_WIFI_STA
+
+    config UPLOAD_ENABLE
+        bool "Upload kept images by HTTP POST"
+        default n
+        depends on CAM_WIFI_STA
+
+    config UPLOAD_URL
+        string "Upload URL (http:// or https://)"
+        default "http://192.168.1.100:8000/upload"
+        depends on UPLOAD_ENABLE
+
+    config UPLOAD_QUEUE_LEN
+        int "Max images waiting for upload (kept in PSRAM)"
+        default 4
+        range 1 10
+
+    config PREVIEW_ENABLE
+        bool "Keep last kept images in PSRAM and show them on http://<esp-ip>/"
+        default y
+        help
+            For testing the change detection: every kept image is also held
+            temporarily in PSRAM (lost on reset, nothing written to flash) and
+            shown on a small web page served by the ESP32 itself.
+
+    config PREVIEW_COUNT
+        int "Number of images kept for the preview page"
+        default 8
+        range 1 30
+        depends on PREVIEW_ENABLE
+
+endmenu

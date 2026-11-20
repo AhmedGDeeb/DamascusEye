@@ -1,0 +1,38 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Log in" %}{% endblock %}
+
+{% block body %}
+<div class="login-wrap">
+  <div class="login-prefs">{% include 'dashboard/partials/preferences.html' %}</div>
+  <div class="card login-card">
+    <div class="brand">
+      <span class="brand-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </span>
+      <span>
+        <span class="brand-name">Damascus Eye</span><br>
+        <span class="brand-sub">{% translate "Sidewalk encroachment monitoring" %}</span>
+      </span>
+    </div>
+
+    <form method="post" class="form-grid">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="notice">{% translate "Incorrect username or password." %}</div>
+      {% endif %}
+      <div class="field">
+        <label for="id_username">{% translate "Username" %}</label>
+        <input type="text" name="username" id="id_username" autofocus autocomplete="username" required value="{{ form.username.value|default:'' }}">
+      </div>
+      <div class="field">
+        <label for="id_password">{% translate "Password" %}</label>
+        <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn primary" type="submit">{% translate "Log in" %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

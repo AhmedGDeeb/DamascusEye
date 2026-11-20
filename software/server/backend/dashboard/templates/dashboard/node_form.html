@@ -1,0 +1,31 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% if node %}{% blocktranslate with code=node.code %}Edit {{ code }}{% endblocktranslate %}{% else %}{% translate "New node" %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="crumbs"><a href="{% url 'dashboard:node_list' %}">{% translate "Nodes" %}</a> / {% if node %}<a href="{% url 'dashboard:node_detail' node.pk %}">{{ node.code }}</a> / {% translate "Edit" %}{% else %}{% translate "New" %}{% endif %}</div>
+    <h1>{% if node %}{% blocktranslate with code=node.code %}Edit node {{ code }}{% endblocktranslate %}{% else %}{% translate "Add node" %}{% endif %}</h1>
+  </div>
+</div>
+
+<div class="card" style="max-width:760px">
+  <form method="post" class="form-grid two">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="field{% if field.name == 'notes' %} full{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="help">{{ field.help_text }}</div>{% endif %}
+        {% if field.errors %}<div class="error">{{ field.errors|join:' ' }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    <div class="field full btn-row">
+      <button class="btn primary" type="submit">{% translate "Save" %}</button>
+      <a class="btn" href="{% if node %}{% url 'dashboard:node_detail' node.pk %}{% else %}{% url 'dashboard:node_list' %}{% endif %}">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+ultralytics>=8.4,<9
+# Ultralytics otherwise installs this on first run.
+pi-heif

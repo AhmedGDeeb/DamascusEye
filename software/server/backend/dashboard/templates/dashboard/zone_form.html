@@ -1,0 +1,54 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% translate "Sidewalk zone" %} · {{ node.code }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="crumbs"><a href="{% url 'dashboard:node_list' %}">{% translate "Nodes" %}</a> / <a href="{% url 'dashboard:node_detail' node.pk %}">{{ node.code }}</a> / {% translate "Sidewalk zone" %}</div>
+    <h1>{% if zone %}{% blocktranslate with name=zone.name %}Edit {{ name }}{% endblocktranslate %}{% else %}{% translate "Draw sidewalk zone" %}{% endif %}</h1>
+    <p>{% translate "Click around the edges of the sidewalk on the image, in order. Objects whose feet fall inside the polygon count as on the sidewalk." %}</p>
+  </div>
+</div>
+
+<form method="post" class="grid grid-main">
+  {% csrf_token %}
+  <div class="card">
+    <div class="viewer editor" id="zone-editor" data-input="{{ form.polygon.id_for_label }}">
+      {% if background_url %}
+        <img src="{{ background_url }}" alt="{% translate 'Latest image from the node' %}" draggable="false">
+      {% else %}
+        <div class="placeholder">{% translate "No image from this node yet." %}<br>{% translate "You can draw on an empty frame now and adjust it later." %}</div>
+      {% endif %}
+      <svg class="zones" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><polygon points=""/></svg>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn small" type="button" id="zone-undo">{% translate "Undo last point" %}</button>
+      <button class="btn small" type="button" id="zone-clear">{% translate "Clear" %}</button>
+      <span class="small muted">{% translate "Points:" %} <b class="num" id="zone-count">0</b></span>
+    </div>
+    {% if form.polygon.errors %}<div class="error" style="margin-top:8px;color:var(--danger)">{{ form.polygon.errors|join:' ' }}</div>{% endif %}
+  </div>
+
+  <div class="card form-grid">
+    {{ form.polygon }}
+    {% for field in form.visible_fields %}
+      <div class="field">
+        {% if field.name == 'is_active' %}
+          <label>{{ field }} {{ field.label }}</label>
+        {% else %}
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+        {% if field.errors %}<div class="error">{{ field.errors|join:' ' }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    <p class="small muted" style="margin:0">{% translate "The actual sidewalk width is used to compute the blocked-width share in the impact score." %}</p>
+    <div class="btn-row">
+      <button class="btn primary" type="submit">{% translate "Save zone" %}</button>
+      <a class="btn" href="{% url 'dashboard:node_detail' node.pk %}">{% translate "Cancel" %}</a>
+    </div>
+  </div>
+</form>
+{% endblock %}

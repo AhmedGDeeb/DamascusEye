@@ -1,0 +1,16 @@
+{% load i18n dashboard_tags %}
+{# One image card. Used by the capture list and by the live feed (dashboard:capture_feed). Expects: card #}
+{% with c=card.capture %}
+<a class="card capture-card" href="{% url 'dashboard:capture_detail' c.pk %}" data-id="{{ c.pk }}" data-status="{{ c.status }}">
+  <img src="{{ card.image_url }}" alt="" loading="lazy">
+  <div class="meta">
+    <div class="row"><b>{{ c.node.code }} <span class="muted num" style="font-weight:400">#{{ c.sequence }}</span></b><span class="badge {{ c.status|tone }}">{{ c.get_status_display }}</span></div>
+    <div class="row muted small">
+      <span>{{ c.captured_at|date:'SHORT_DATETIME_FORMAT' }}</span>
+      {% if c.status == 'done' %}
+        <span>{% if card.on_sidewalk %}{% blocktranslate with count=card.on_sidewalk %}<b style="color:var(--danger)">{{ count }}</b> on sidewalk{% endblocktranslate %}{% else %}{% blocktranslate with count=card.total %}{{ count }} detected{% endblocktranslate %}{% endif %}</span>
+      {% endif %}
+    </div>
+  </div>
+</a>
+{% endwith %}

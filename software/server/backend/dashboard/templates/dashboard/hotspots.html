@@ -1,0 +1,66 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% translate "Hotspots" %}{% endblock %}
+
+{% block content %}
+{% get_current_language_bidi as rtl %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Weekly hotspots" %}</h1>
+    <p>{% blocktranslate with start=week_start|date:'MONTH_DAY_FORMAT' end=week_end|date:'DATE_FORMAT' %}Week of {{ start }} – {{ end }}: locations ranked by total impact score, to send to the Directorate's inspectors.{% endblocktranslate %}</p>
+  </div>
+  <div class="btn-row no-print">
+    <a class="btn" href="?week={{ weeks_back|add:1 }}">{% if rtl %}→{% else %}←{% endif %} {% translate "Previous week" %}</a>
+    {% if weeks_back %}<a class="btn" href="?week={{ weeks_back|add:-1 }}">{% translate "Next week" %} {% if rtl %}←{% else %}→{% endif %}</a>{% endif %}
+    <button class="btn primary" type="button" onclick="window.print()">{% translate "Print / PDF" %}</button>
+  </div>
+</div>
+
+<div class="card flush" style="margin-bottom:16px">
+  <div class="card-head"><h2>{% translate "Locations" %}</h2></div>
+  <div class="table-wrap" style="margin-top:12px">
+    <table>
+      <thead><tr><th>#</th><th>{% translate "Node" %}</th><th>{% translate "Violations" %}</th><th>{% translate "Total impact" %}</th><th>{% translate "Highest score" %}</th><th>{% translate "Sightings" %}</th><th>{% translate "Types" %}</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td class="num muted">{{ forloop.counter }}</td>
+          <td><a href="{% url 'dashboard:node_detail' r.node__id %}"><b>{{ r.node__code }}</b></a> <span class="muted small">{{ r.node__name }}</span></td>
+          <td class="num">{{ r.count }}</td>
+          <td class="num"><b>{{ r.total_impact|floatformat:0|default:'—' }}</b></td>
+          <td><span class="score {{ r.max_impact|score_tone }}">{{ r.max_impact|floatformat:0|default:'—' }}</span></td>
+          <td class="num">{{ r.repeats }}</td>
+          <td class="small">{{ r.categories|join:' · ' }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="empty">{% translate "No violations this week." %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if top_violations %}
+<div class="card flush">
+  <div class="card-head"><h2>{% translate "Top 10 violations this week" %}</h2></div>
+  <div class="table-wrap" style="margin-top:12px">
+    <table>
+      <thead><tr><th>{% translate "Violation" %}</th><th>{% translate "Node" %}</th><th>{% translate "Impact" %}</th><th>{% translate "First seen" %}</th><th>{% translate "Duration" %}</th><th>{% translate "Status" %}</th></tr></thead>
+      <tbody>
+      {% for v in top_violations %}
+        <tr>
+          <td><a href="{% url 'dashboard:violation_detail' v.pk %}">{{ v.get_category_display }} #{{ v.pk }}</a></td>
+          <td>{{ v.node.code }}</td>
+          <td><span class="score {{ v.impact_score|score_tone }}">{{ v.impact_score|floatformat:0|default:'—' }}</span></td>
+          <td class="small nowrap">{{ v.first_seen_at|date:'D' }} {{ v.first_seen_at|date:'SHORT_DATETIME_FORMAT' }}</td>
+          <td class="small nowrap">{{ v.duration|duration }} · <span class="num">{{ v.repeat_count }}×</span></td>
+          <td><span class="badge {{ v.status|tone }}">{{ v.get_status_display }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

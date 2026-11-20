@@ -1,0 +1,944 @@
+# Arabic translation of the Damascus Eye dashboard.
+#
+# After editing, compile with:  python manage.py compile_translations
+# dashboard/tests_i18n.py fails if a string in the code has no entry here.
+msgid ""
+msgstr ""
+"Project-Id-Version: Damascus Eye\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+# Layout and navigation
+
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+msgid "Sidewalk encroachment monitoring"
+msgstr "رصد إشغالات الأرصفة"
+
+msgid "Overview"
+msgstr "نظرة عامة"
+
+msgid "Violations"
+msgstr "المخالفات"
+
+msgid "Images & detection"
+msgstr "الصور والكشف"
+
+msgid "Nodes"
+msgstr "العقد"
+
+msgid "Alerts"
+msgstr "التنبيهات"
+
+msgid "Hotspots"
+msgstr "النقاط الساخنة"
+
+msgid "Admin"
+msgstr "الإدارة"
+
+msgid "Log out"
+msgstr "خروج"
+
+msgid "Log in"
+msgstr "تسجيل الدخول"
+
+msgid "Awaiting inspector response"
+msgstr "بانتظار رد المفتشين"
+
+msgid "Switch light / dark theme"
+msgstr "التبديل بين الوضع الفاتح والداكن"
+
+msgid "Incorrect username or password."
+msgstr "اسم المستخدم أو كلمة المرور غير صحيحة."
+
+msgid "Username"
+msgstr "اسم المستخدم"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Pages"
+msgstr "الصفحات"
+
+msgid "Previous"
+msgstr "السابق"
+
+msgid "Next"
+msgstr "التالي"
+
+msgid "Page %(number)s of %(total)s"
+msgstr "صفحة %(number)s من %(total)s"
+
+# Common words
+
+msgid "All"
+msgstr "الكل"
+
+msgid "Filter"
+msgstr "تصفية"
+
+msgid "Clear filters"
+msgstr "مسح التصفية"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Update"
+msgstr "تحديث"
+
+msgid "Clear"
+msgstr "مسح"
+
+msgid "New"
+msgstr "جديدة"
+
+msgid "Yes"
+msgstr "نعم"
+
+msgid "No"
+msgstr "لا"
+
+msgid "Note"
+msgstr "ملاحظة"
+
+msgid "Notes"
+msgstr "ملاحظات"
+
+msgid "Date"
+msgstr "التاريخ"
+
+msgid "Error"
+msgstr "الخطأ"
+
+msgid "Now"
+msgstr "الآن"
+
+msgid "System"
+msgstr "النظام"
+
+msgid "Type"
+msgstr "النوع"
+
+msgid "Types"
+msgstr "الأنواع"
+
+msgid "Node"
+msgstr "العقدة"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Impact"
+msgstr "التأثير"
+
+msgid "Duration"
+msgstr "المدة"
+
+msgid "Sightings"
+msgstr "مرات الرصد"
+
+msgid "First seen"
+msgstr "أول رصد"
+
+msgid "Last seen"
+msgstr "آخر اتصال"
+
+msgid "Images"
+msgstr "الصور"
+
+msgid "Violation"
+msgstr "المخالفة"
+
+msgid "Response"
+msgstr "الرد"
+
+msgid "Target"
+msgstr "الهدف"
+
+msgid "%(value)s m"
+msgstr "%(value)s م"
+
+msgid "%(ago)s ago"
+msgstr "منذ %(ago)s"
+
+msgid "%(n)sd"
+msgstr "%(n)s ي"
+
+msgid "%(n)sh"
+msgstr "%(n)s س"
+
+msgid "%(n)sm"
+msgstr "%(n)s د"
+
+msgid "Never connected"
+msgstr "لم تتصل أبداً"
+
+msgid "Online"
+msgstr "متصلة"
+
+msgid "Offline"
+msgstr "منقطعة"
+
+# Overview
+
+msgid "Network status, violations and field-pilot results."
+msgstr "حالة الشبكة والمخالفات ونتائج التجربة الميدانية."
+
+msgid "Review %(count)s violations"
+msgstr "مراجعة %(count)s مخالفة"
+
+msgid "Weekly list"
+msgstr "قائمة الأسبوع"
+
+msgid "Nodes online"
+msgstr "العقد المتصلة"
+
+msgid "Offline: %(count)s — check on site"
+msgstr "منقطعة: %(count)s — تحقّقوا منها"
+
+msgid "All nodes are running"
+msgstr "كل العقد تعمل"
+
+msgid "Images today"
+msgstr "صور اليوم"
+
+msgid "In detection queue: %(count)s"
+msgstr "في طابور الكشف: %(count)s"
+
+msgid "Failed: %(count)s"
+msgstr "فشلت: %(count)s"
+
+msgid "Awaiting review"
+msgstr "بانتظار المراجعة"
+
+msgid "Violations needing a reviewer's decision"
+msgstr "مخالفات تحتاج قراراً من المراجع"
+
+msgid "Confirmed, not alerted"
+msgstr "مؤكدة بلا تنبيه"
+
+msgid "Ready to send to the inspectors"
+msgstr "جاهزة للإرسال إلى المفتشين"
+
+msgid "Highest-impact open violations"
+msgstr "أعلى المخالفات المفتوحة تأثيراً"
+
+msgid "View all"
+msgstr "عرض الكل"
+
+msgid "No open violations."
+msgstr "لا توجد مخالفات مفتوحة."
+
+msgid "Images, last 7 days"
+msgstr "الصور خلال 7 أيام"
+
+msgid "Encroachment types (7 days)"
+msgstr "أنواع الإشغال (7 أيام)"
+
+msgid "No data yet."
+msgstr "لا توجد بيانات بعد."
+
+msgid "Latest images"
+msgstr "آخر الصور"
+
+msgid "All images"
+msgstr "كل الصور"
+
+msgid "No images have arrived yet. Check that the gateway bridge is running."
+msgstr "لم تصل أي صورة بعد. تأكّدوا من تشغيل جسر البوابة."
+
+msgid "Pilot decision"
+msgstr "قرار التجربة"
+
+msgid "Last 14 days"
+msgstr "آخر 14 يوماً"
+
+msgid "Offline nodes"
+msgstr "عقد منقطعة"
+
+msgid "Last seen %(ago)s ago"
+msgstr "آخر اتصال منذ %(ago)s"
+
+msgid "No offline nodes."
+msgstr "لا توجد عقد منقطعة."
+
+# Pilot metrics
+
+msgid "Continue: inspectors are acting on the alerts"
+msgstr "استمرار: المفتشون يستجيبون للتنبيهات"
+
+msgid "Adjust: change the alert format, scoring or channel"
+msgstr "تعديل: غيّروا صيغة التنبيه أو التقييم أو القناة"
+
+msgid "Stop: fewer than %(threshold)s of alerts led to action"
+msgstr "توقف: أقل من %(threshold)s من التنبيهات أدت إلى إجراء"
+
+msgid "No alerts yet to evaluate the pilot"
+msgstr "لا توجد تنبيهات بعد لتقييم التجربة"
+
+msgid "Response within 48 hours"
+msgstr "استجابة خلال 48 ساعة"
+
+msgid "Continue target"
+msgstr "هدف الاستمرار"
+
+msgid "Target: %(target)s or more"
+msgstr "الهدف: %(target)s أو أكثر"
+
+msgid "Alerts that led to action"
+msgstr "تنبيهات أدت إلى إجراء"
+
+msgid "Stop threshold"
+msgstr "حد التوقف"
+
+msgid "Stop threshold: below %(threshold)s"
+msgstr "حد التوقف: أقل من %(threshold)s"
+
+msgid "Nodes online (theft check)"
+msgstr "العقد المتصلة (فحص السرقة)"
+
+# Image viewer
+
+msgid "Image from the node"
+msgstr "صورة من العقدة"
+
+msgid "Faces and plates have not been blurred yet"
+msgstr "لم تُموَّه الوجوه واللوحات بعد"
+
+msgid "Not blurred"
+msgstr "غير مموّهة"
+
+msgid "On the sidewalk"
+msgstr "على الرصيف"
+
+msgid "Off the sidewalk"
+msgstr "خارج الرصيف"
+
+msgid "Sidewalk zone"
+msgstr "منطقة الرصيف"
+
+# Violations
+
+msgid "Open"
+msgstr "مفتوحة"
+
+msgid "Sorted by impact score: blocked width, duration and number of sightings."
+msgstr "مرتبة حسب درجة التأثير: العرض المغلق، المدة، وعدد مرات الرصد."
+
+msgid "All types"
+msgstr "كل الأنواع"
+
+msgid "All nodes"
+msgstr "كل العقد"
+
+msgid "Duration / repeats"
+msgstr "المدة / التكرار"
+
+msgid "No violations match this filter."
+msgstr "لا توجد مخالفات بهذه التصفية."
+
+msgid "Violations are recorded from any image under <a href=\"%(captures_url)s\">Images &amp; detection</a>."
+msgstr "تُسجَّل المخالفات من صفحة أي صورة في <a href=\"%(captures_url)s\">الصور والكشف</a>."
+
+msgid "Violation #%(pk)s"
+msgstr "مخالفة #%(pk)s"
+
+msgid "at %(place)s"
+msgstr "في %(place)s"
+
+msgid "Mark this violation as removed?"
+msgstr "تسجيل المخالفة كمُزالة؟"
+
+msgid "Mark as removed"
+msgstr "سُجّلت إزالتها"
+
+msgid "Image #%(seq)s"
+msgstr "الصورة #%(seq)s"
+
+msgid "No images are linked to this violation."
+msgstr "لا توجد صور مرتبطة بهذه المخالفة."
+
+msgid "Review history"
+msgstr "سجل المراجعة"
+
+msgid "score"
+msgstr "درجة"
+
+msgid "Not reviewed yet."
+msgstr "لم تُراجَع بعد."
+
+msgid "Impact score"
+msgstr "درجة التأثير"
+
+msgid "Last sighting"
+msgstr "آخر رصد"
+
+msgid "Occupancy"
+msgstr "نسبة الإشغال"
+
+msgid "Blocked width"
+msgstr "العرض المغلق"
+
+msgid "%(blocked)s m of %(total)s m"
+msgstr "%(blocked)s م من %(total)s م"
+
+msgid "Recorded by"
+msgstr "سجّلها"
+
+msgid "Score out of 100: blocked width 50, duration 30 (full at 8 hours), repeats 20. A reviewer's score replaces the computed one."
+msgstr "الدرجة من 100: العرض المغلق 50، المدة 30 (تكتمل عند 8 ساعات)، التكرار 20. درجة المراجع تحل محل المحسوبة."
+
+msgid "Review"
+msgstr "المراجعة"
+
+msgid "The decision can be changed"
+msgstr "يمكن تعديل القرار"
+
+msgid "Save review"
+msgstr "حفظ المراجعة"
+
+msgid "Alert the inspectors"
+msgstr "تنبيه المفتشين"
+
+msgid "Copied ✓"
+msgstr "تم النسخ ✓"
+
+msgid "Copy text"
+msgstr "نسخ النص"
+
+msgid "Open in WhatsApp"
+msgstr "فتح في واتساب"
+
+msgid "Record as sent"
+msgstr "تسجيل الإرسال"
+
+msgid "Send the text, then record it to start the 48-hour clock. The text is always in Arabic for the Directorate."
+msgstr "أرسلوا النص ثم سجّلوا الإرسال ليبدأ عدّاد الـ 48 ساعة. النص بالعربية دائماً لأنه موجّه للمديرية."
+
+msgid "Alerts are available once the violation is confirmed."
+msgstr "التنبيه متاح بعد تأكيد المخالفة."
+
+msgid "Within 48 h"
+msgstr "خلال 48 س"
+
+# Images
+
+msgid "Every image received from the nodes, with the result of the latest YOLO run."
+msgstr "كل صورة وصلت من العقد، مع نتيجة آخر تشغيل لموديل YOLO."
+
+msgid "Detection status"
+msgstr "حالة الكشف"
+
+msgid "<b style=\"color:var(--danger)\">%(count)s</b> on sidewalk"
+msgstr "<b style=\"color:var(--danger)\">%(count)s</b> على الرصيف"
+
+msgid "%(count)s detected"
+msgstr "%(count)s كشف"
+
+msgid "No images match this filter."
+msgstr "لا توجد صور بهذه التصفية."
+
+msgid "%(count)s on sidewalk"
+msgstr "%(count)s على الرصيف"
+
+msgid "Older"
+msgstr "الأقدم"
+
+msgid "Newer"
+msgstr "الأحدث"
+
+msgid "No sidewalk zone has been drawn for this node, so the system cannot tell which objects are on the sidewalk. <a href=\"%(zone_url)s\">Draw it now</a>."
+msgstr "لم تُرسم منطقة رصيف لهذه العقدة، فلا يمكن معرفة أي الأجسام على الرصيف. <a href=\"%(zone_url)s\">ارسموها الآن</a>."
+
+msgid "Detection results"
+msgstr "نتائج الكشف"
+
+msgid "Class"
+msgstr "الصنف"
+
+msgid "Confidence"
+msgstr "الثقة"
+
+msgid "Location"
+msgstr "الموقع"
+
+msgid "Box (x1, y1, x2, y2)"
+msgstr "الصندوق (x1, y1, x2, y2)"
+
+msgid "The model detected no objects."
+msgstr "لم يكتشف الموديل أي جسم."
+
+msgid "Detection failed: %(error)s"
+msgstr "فشل الكشف: %(error)s"
+
+msgid "The image is in the detection queue; results appear once the YOLO manager processes it."
+msgstr "الصورة في طابور الكشف؛ ستظهر النتائج عندما يعالجها مدير اليولو."
+
+msgid "Record a violation"
+msgstr "تسجيل مخالفة"
+
+msgid "Occupancy is suggested from the detection boxes and may be higher than the real value."
+msgstr "نسبة الإشغال مقترحة من صناديق الكشف وقد تكون أعلى من الحقيقية."
+
+msgid "Record violation"
+msgstr "تسجيل المخالفة"
+
+msgid "If this node already has an open violation of the same type from the last 12 hours, the image is added to it instead of creating a new one."
+msgstr "إذا كانت هناك مخالفة مفتوحة من النوع نفسه في هذه العقدة خلال آخر 12 ساعة، تُضاف الصورة إليها بدل إنشاء مخالفة جديدة."
+
+msgid "Linked violations"
+msgstr "مخالفات مرتبطة"
+
+msgid "Image details"
+msgstr "بيانات الصورة"
+
+msgid "Frame number"
+msgstr "رقم الإطار"
+
+msgid "Captured"
+msgstr "وقت الالتقاط"
+
+msgid "Received"
+msgstr "وقت الوصول"
+
+msgid "Dimensions"
+msgstr "الأبعاد"
+
+msgid "Detection attempts"
+msgstr "محاولات الكشف"
+
+msgid "Run detection again"
+msgstr "إعادة الكشف"
+
+# Nodes
+
+msgid "Solar camera nodes on the pilot corridor. A node not heard from for 30 minutes shows as offline."
+msgstr "عقد الكاميرا الشمسية على الممر التجريبي. العقدة التي لا تتصل لمدة 30 دقيقة تظهر منقطعة."
+
+msgid "Add node"
+msgstr "إضافة عقدة"
+
+msgid "The map could not load (no internet connection)."
+msgstr "تعذّر تحميل الخريطة (لا يوجد اتصال بالإنترنت)."
+
+msgid "Add node coordinates to show them on the map."
+msgstr "أضيفوا إحداثيات العقد لتظهر على الخريطة."
+
+msgid "Code"
+msgstr "الرمز"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Connection"
+msgstr "الاتصال"
+
+msgid "Battery"
+msgstr "البطارية"
+
+msgid "Open violations"
+msgstr "مخالفات مفتوحة"
+
+msgid "No nodes yet. <a href=\"%(create_url)s\">Add the first node</a> with the same code the firmware sends."
+msgstr "لا توجد عقد بعد. <a href=\"%(create_url)s\">أضيفوا أول عقدة</a> بالرمز نفسه الذي ترسله البرمجة الثابتة."
+
+msgid "All its images"
+msgstr "كل صورها"
+
+msgid "Low — check the solar panel"
+msgstr "منخفضة — تحقّقوا من اللوح الشمسي"
+
+msgid "18650 cell"
+msgstr "خلية 18650"
+
+msgid "Heartbeats in 48 h: %(count)s"
+msgstr "النبضات خلال 48 ساعة: %(count)s"
+
+msgid "Processed: %(count)s"
+msgstr "تم كشفها: %(count)s"
+
+msgid "Signal strength"
+msgstr "إشارة الشبكة"
+
+msgid "At the gateway, last heartbeat"
+msgstr "عند البوابة في آخر نبضة"
+
+msgid "Latest image and sidewalk zones"
+msgstr "آخر صورة ومناطق الرصيف"
+
+msgid "Draw sidewalk zone"
+msgstr "رسم منطقة رصيف"
+
+msgid "No image has arrived from this node yet."
+msgstr "لم تصل أي صورة من هذه العقدة بعد."
+
+msgid "Zone"
+msgstr "المنطقة"
+
+msgid "Width"
+msgstr "العرض"
+
+msgid "Points"
+msgstr "النقاط"
+
+msgid "Disabled"
+msgstr "معطّلة"
+
+msgid "Delete this sidewalk zone?"
+msgstr "حذف منطقة الرصيف؟"
+
+msgid "No sidewalk zone yet. Draw one so the system knows which objects are on the sidewalk."
+msgstr "لا توجد منطقة رصيف. ارسموها ليعرف النظام أي الأجسام على الرصيف."
+
+msgid "Battery, last 48 hours"
+msgstr "البطارية خلال 48 ساعة"
+
+msgid "Battery voltage over time"
+msgstr "منحنى جهد البطارية"
+
+msgid "48 h ago"
+msgstr "قبل 48 ساعة"
+
+msgid "No heartbeats in the last 48 hours."
+msgstr "لا توجد نبضات خلال آخر 48 ساعة."
+
+msgid "No images."
+msgstr "لا توجد صور."
+
+msgid "Node details"
+msgstr "بيانات العقدة"
+
+msgid "MAC address"
+msgstr "عنوان MAC"
+
+msgid "Coordinates"
+msgstr "الإحداثيات"
+
+msgid "Mounting height"
+msgstr "ارتفاع التركيب"
+
+msgid "Below 3 m"
+msgstr "أقل من 3 م"
+
+msgid "Installed on"
+msgstr "تاريخ التركيب"
+
+msgid "Latest image"
+msgstr "آخر صورة"
+
+msgid "Edit %(code)s"
+msgstr "تعديل %(code)s"
+
+msgid "New node"
+msgstr "عقدة جديدة"
+
+msgid "Edit node %(code)s"
+msgstr "تعديل العقدة %(code)s"
+
+# Sidewalk zone editor
+
+msgid "Edit %(name)s"
+msgstr "تعديل %(name)s"
+
+msgid "Click around the edges of the sidewalk on the image, in order. Objects whose feet fall inside the polygon count as on the sidewalk."
+msgstr "انقروا على الصورة حول حواف الرصيف بالترتيب. الأجسام التي تقف أقدامها داخل المضلّع تُعد على الرصيف."
+
+msgid "Latest image from the node"
+msgstr "آخر صورة من العقدة"
+
+msgid "No image from this node yet."
+msgstr "لا توجد صورة من هذه العقدة بعد."
+
+msgid "You can draw on an empty frame now and adjust it later."
+msgstr "يمكن الرسم الآن على إطار فارغ وتعديله لاحقاً."
+
+msgid "Undo last point"
+msgstr "تراجع عن آخر نقطة"
+
+msgid "Points:"
+msgstr "النقاط:"
+
+msgid "The actual sidewalk width is used to compute the blocked-width share in the impact score."
+msgstr "عرض الرصيف الفعلي يُستخدم لحساب نسبة العرض المغلق في درجة التأثير."
+
+msgid "Save zone"
+msgstr "حفظ المنطقة"
+
+# Alerts
+
+msgid "Alerts and inspector responses"
+msgstr "التنبيهات وردود المفتشين"
+
+msgid "Record the inspectors' response to each alert; these numbers decide whether the pilot continues, adjusts or stops."
+msgstr "سجّلوا رد المفتشين على كل تنبيه؛ هذه الأرقام هي ما يقرر الاستمرار في التجربة أو تعديلها أو إيقافها."
+
+msgid "Since the start"
+msgstr "منذ البداية"
+
+msgid "All alerts"
+msgstr "كل التنبيهات"
+
+msgid "Answered within 48 h"
+msgstr "رد خلال 48 س"
+
+msgid "Led to action"
+msgstr "أدت إلى إجراء"
+
+msgid "“Led to action” means the Directorate dispatched an inspector or the encroachment was removed. An acknowledgement alone does not count."
+msgstr "«أدت إلى إجراء» تعني أن المديرية أرسلت مفتشاً أو أُزيل الإشغال. الاستلام وحده لا يُحسب."
+
+msgid "All responses"
+msgstr "كل الردود"
+
+msgid "Sent"
+msgstr "أُرسل"
+
+msgid "Update response"
+msgstr "تحديث الرد"
+
+msgid "after %(delay)s"
+msgstr "بعد %(delay)s"
+
+msgid "No alerts sent yet. Confirm a violation, then record the alert from its page."
+msgstr "لم يُرسل أي تنبيه بعد. أكّدوا مخالفة ثم سجّلوا إرسال التنبيه من صفحتها."
+
+# Weekly hotspots
+
+msgid "Weekly hotspots"
+msgstr "النقاط الساخنة الأسبوعية"
+
+msgid "Week of %(start)s – %(end)s: locations ranked by total impact score, to send to the Directorate's inspectors."
+msgstr "أسبوع %(start)s – %(end)s: المواقع مرتبة حسب مجموع درجات التأثير، لإرسالها إلى مفتشي المديرية."
+
+msgid "Previous week"
+msgstr "الأسبوع السابق"
+
+msgid "Next week"
+msgstr "الأسبوع التالي"
+
+msgid "Print / PDF"
+msgstr "طباعة / PDF"
+
+msgid "Locations"
+msgstr "المواقع"
+
+msgid "Total impact"
+msgstr "مجموع التأثير"
+
+msgid "Highest score"
+msgstr "أعلى درجة"
+
+msgid "No violations this week."
+msgstr "لا توجد مخالفات في هذا الأسبوع."
+
+msgid "Top 10 violations this week"
+msgstr "أعلى 10 مخالفات هذا الأسبوع"
+
+# Forms
+
+msgid "Node code"
+msgstr "رمز العقدة"
+
+msgid "Name or location"
+msgstr "الاسم أو الموقع"
+
+msgid "Latitude"
+msgstr "خط العرض"
+
+msgid "Longitude"
+msgstr "خط الطول"
+
+msgid "Mounting height (m)"
+msgstr "ارتفاع التركيب (م)"
+
+msgid "The ID the firmware sends, e.g. N01."
+msgstr "الرمز الذي ترسله البرمجة الثابتة، مثل N01."
+
+msgid "e.g. 24:6F:28:AA:BB:CC"
+msgstr "مثل 24:6F:28:AA:BB:CC"
+
+msgid "Zone name"
+msgstr "اسم المنطقة"
+
+msgid "Actual sidewalk width (m)"
+msgstr "عرض الرصيف الفعلي (م)"
+
+msgid "Encroachment type"
+msgstr "نوع الإشغال"
+
+msgid "— none —"
+msgstr "— بدون —"
+
+msgid "Sidewalk occupancy (0 to 1)"
+msgstr "نسبة إشغال الرصيف (0 إلى 1)"
+
+msgid "Blocked width (m)"
+msgstr "العرض المغلق (م)"
+
+msgid "Decision"
+msgstr "القرار"
+
+msgid "Impact score (optional, overrides the computed one)"
+msgstr "درجة التأثير (اختياري، تحل محل المحسوبة)"
+
+msgid "Channel"
+msgstr "القناة"
+
+msgid "Inspector response"
+msgstr "رد المفتشين"
+
+msgid "Draw the polygon on the image first (at least 3 points)."
+msgstr "ارسموا المضلّع على الصورة أولاً (3 نقاط على الأقل)."
+
+msgid "The polygon needs at least 3 points."
+msgstr "المضلّع يحتاج 3 نقاط على الأقل."
+
+msgid "All points must be inside the image."
+msgstr "النقاط يجب أن تكون داخل الصورة."
+
+msgid "Invalid polygon format."
+msgstr "صيغة المضلّع غير صحيحة."
+
+# Messages after actions
+
+msgid "Violation marked as removed."
+msgstr "سُجّلت المخالفة كمُزالة."
+
+msgid "Image sent back to the detection queue."
+msgstr "أُعيدت الصورة إلى طابور الكشف."
+
+msgid "Sidewalk zone deleted."
+msgstr "حُذفت منطقة الرصيف."
+
+msgid "Review saved."
+msgstr "تم حفظ المراجعة."
+
+msgid "Choose a valid review decision."
+msgstr "اختر قراراً صالحاً للمراجعة."
+
+msgid "Sidewalk zone saved. New detections will be matched against the updated polygon."
+msgstr "تم حفظ منطقة الرصيف. الكشوفات الجديدة ستُطابق مع المضلّع المحدّث."
+
+msgid "Inspector response updated."
+msgstr "تم تحديث رد المفتشين."
+
+msgid "Alert recorded. Track the inspectors' response on the Alerts page."
+msgstr "تم تسجيل التنبيه. تابعوا رد المفتشين من صفحة التنبيهات."
+
+msgid "Node %(code)s saved."
+msgstr "تم حفظ العقدة %(code)s."
+
+msgid "New violation created."
+msgstr "أُنشئت مخالفة جديدة."
+
+msgid "Image added to the open violation for the same node and type."
+msgstr "أُضيفت الصورة إلى مخالفة مفتوحة لنفس الموقع والنوع."
+
+msgid "Alerts can only be sent for a confirmed violation."
+msgstr "لا يُرسل تنبيه إلا لمخالفة مؤكدة."
+
+# Model choices
+
+msgid "Active"
+msgstr "فعّالة"
+
+msgid "Maintenance"
+msgstr "صيانة"
+
+msgid "Retired"
+msgstr "خارج الخدمة"
+
+msgid "Awaiting detection"
+msgstr "بانتظار الكشف"
+
+msgid "Processing"
+msgstr "قيد المعالجة"
+
+msgid "Detected"
+msgstr "تم الكشف"
+
+msgid "Failed"
+msgstr "فشل"
+
+msgid "Displayed goods"
+msgstr "بضائع معروضة"
+
+msgid "Tables and chairs"
+msgstr "طاولات وكراسي"
+
+msgid "Stall or kiosk"
+msgstr "بسطة أو كشك"
+
+msgid "Parked vehicle"
+msgstr "مركبة متوقفة"
+
+msgid "Waste"
+msgstr "نفايات"
+
+msgid "Other"
+msgstr "أخرى"
+
+msgid "Confirmed"
+msgstr "مؤكدة"
+
+msgid "Rejected"
+msgstr "مرفوضة"
+
+msgid "Removed"
+msgstr "أزيلت"
+
+msgid "Confirm"
+msgstr "تأكيد"
+
+msgid "Reject"
+msgstr "رفض"
+
+msgid "WhatsApp"
+msgstr "واتساب"
+
+msgid "No response yet"
+msgstr "لا رد بعد"
+
+msgid "Acknowledged"
+msgstr "تم الاستلام"
+
+msgid "Inspector dispatched"
+msgstr "أُرسل مفتش"
+
+msgid "Removed on site"
+msgstr "أزيلت ميدانياً"
+
+msgid "Declined or ignored"
+msgstr "رُفض أو تُجوهل"
+
+# Live image list
+
+msgid "Live"
+msgstr "مباشر"
+
+msgid "new"
+msgstr "جديدة"
+
+msgid "Live updates paused — reconnecting…"
+msgstr "التحديث المباشر متوقف — جارٍ إعادة الاتصال…"
+
+msgid "Session expired — reload the page"
+msgstr "انتهت الجلسة — أعيدوا تحميل الصفحة"
+
+# Automatic sidewalk detection
+
+msgid "Sidewalk (detected by AI)"
+msgstr "الرصيف (كشف تلقائي)"

@@ -1,0 +1,24 @@
+{% load i18n %}
+{# Image with the detected sidewalk, hand-drawn zones and YOLO boxes. Expects: image_url, redacted, zones, boxes, auto_sidewalk #}
+<div class="viewer">
+  <img src="{{ image_url }}" alt="{% translate 'Image from the node' %}">
+  <svg class="zones" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
+    {% for points in auto_sidewalk %}<polygon class="auto" points="{{ points }}"/>{% endfor %}
+    {% for z in zones %}<polygon points="{{ z.points }}"/>{% endfor %}
+  </svg>
+  {% for b in boxes %}
+    <div class="box{% if b.on_sidewalk %} on{% endif %}"
+         style="left:{{ b.left|stringformat:'.2f' }}%;top:{{ b.top|stringformat:'.2f' }}%;width:{{ b.width|stringformat:'.2f' }}%;height:{{ b.height|stringformat:'.2f' }}%">
+      <span>{{ b.detection.class_name }} {{ b.detection.confidence|floatformat:2 }}</span>
+    </div>
+  {% endfor %}
+  {% if not redacted %}
+    <span class="redaction badge warn" title="{% translate 'Faces and plates have not been blurred yet' %}">{% translate "Not blurred" %}</span>
+  {% endif %}
+</div>
+<div class="legend">
+  {% if auto_sidewalk %}<span><i class="swatch-auto"></i>{% translate "Sidewalk (detected by AI)" %}</span>{% endif %}
+  <span><i style="background:#ff5a47"></i>{% translate "On the sidewalk" %}</span>
+  <span><i style="background:#f2b134"></i>{% translate "Off the sidewalk" %}</span>
+  {% if zones %}<span><i style="background:rgba(63,184,160,.5);border:1px dashed #3fb8a0"></i>{% translate "Sidewalk zone" %}</span>{% endif %}
+</div>

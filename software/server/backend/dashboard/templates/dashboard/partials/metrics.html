@@ -1,0 +1,44 @@
+{% load i18n dashboard_tags %}
+{# Pilot decision from the MVP canvas. Expects: metrics #}
+<div class="verdict {{ metrics.verdict }}">
+  {% if metrics.verdict == 'continue' %}{% translate "Continue: inspectors are acting on the alerts" %}
+  {% elif metrics.verdict == 'adjust' %}{% translate "Adjust: change the alert format, scoring or channel" %}
+  {% elif metrics.verdict == 'stop' %}{% blocktranslate with threshold=metrics.stop_threshold|pct %}Stop: fewer than {{ threshold }} of alerts led to action{% endblocktranslate %}
+  {% else %}{% translate "No alerts yet to evaluate the pilot" %}{% endif %}
+</div>
+
+<div style="margin-top:14px">
+  <div class="card-head" style="margin:0"><h3>{% translate "Response within 48 hours" %}</h3>
+    <span class="num"><b>{{ metrics.response_rate|pct }}</b> <span class="muted small">({{ metrics.responded_within_48h }}/{{ metrics.alerts_total }})</span></span>
+  </div>
+  <div class="meter">
+    <span class="{% if metrics.response_rate is None %}{% elif metrics.response_rate >= metrics.continue_threshold %}ok{% elif metrics.response_rate >= metrics.stop_threshold %}warn{% else %}danger{% endif %}"
+          style="width:{% if metrics.response_rate %}{% widthratio metrics.response_rate 1 100 %}{% else %}0{% endif %}%"></span>
+    <i class="mark" style="inset-inline-start:{% widthratio metrics.continue_threshold 1 100 %}%" title="{% translate 'Continue target' %}"></i>
+  </div>
+  <div class="small muted">{% blocktranslate with target=metrics.continue_threshold|pct %}Target: {{ target }} or more{% endblocktranslate %}</div>
+</div>
+
+<div style="margin-top:14px">
+  <div class="card-head" style="margin:0"><h3>{% translate "Alerts that led to action" %}</h3>
+    <span class="num"><b>{{ metrics.action_rate|pct }}</b> <span class="muted small">({{ metrics.acted }}/{{ metrics.alerts_total }})</span></span>
+  </div>
+  <div class="meter">
+    <span class="{% if metrics.action_rate is None %}{% elif metrics.action_rate < metrics.stop_threshold %}danger{% else %}ok{% endif %}"
+          style="width:{% if metrics.action_rate %}{% widthratio metrics.action_rate 1 100 %}{% else %}0{% endif %}%"></span>
+    <i class="mark" style="inset-inline-start:{% widthratio metrics.stop_threshold 1 100 %}%" title="{% translate 'Stop threshold' %}"></i>
+  </div>
+  <div class="small muted">{% blocktranslate with threshold=metrics.stop_threshold|pct %}Stop threshold: below {{ threshold }}{% endblocktranslate %}</div>
+</div>
+
+<div style="margin-top:14px">
+  <div class="card-head" style="margin:0"><h3>{% translate "Nodes online (theft check)" %}</h3>
+    <span class="num"><b>{{ metrics.nodes_online_rate|pct }}</b> <span class="muted small">({{ metrics.nodes_online }}/{{ metrics.nodes_total }})</span></span>
+  </div>
+  <div class="meter">
+    <span class="{% if metrics.nodes_online_rate is None %}{% elif metrics.nodes_online_rate >= metrics.nodes_online_target %}ok{% else %}danger{% endif %}"
+          style="width:{% if metrics.nodes_online_rate %}{% widthratio metrics.nodes_online_rate 1 100 %}{% else %}0{% endif %}%"></span>
+    <i class="mark" style="inset-inline-start:{% widthratio metrics.nodes_online_target 1 100 %}%" title="{% translate 'Target' %}"></i>
+  </div>
+  <div class="small muted">{% blocktranslate with target=metrics.nodes_online_target|pct %}Target: {{ target }} or more{% endblocktranslate %}</div>
+</div>
