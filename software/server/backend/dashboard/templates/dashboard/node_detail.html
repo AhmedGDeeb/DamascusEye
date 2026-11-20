@@ -1,0 +1,144 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{{ node.code }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <div class="crumbs"><a href="{% url 'dashboard:node_list' %}">{% translate "Nodes" %}</a> / {{ node.code }}</div>
+    <h1>{{ node.code }} {% if node.name %}<span class="muted" style="font-weight:500">{{ node.name }}</span>{% endif %}</h1>
+    <p>
+      {% if node.is_online %}<span class="badge ok"><i class="dot"></i>{% translate "Online" %}</span>{% else %}<span class="badge danger"><i class="dot"></i>{% translate "Offline" %}</span>{% endif %}
+      <span class="badge {{ node.status|tone }}">{{ node.get_status_display }}</span>
+    </p>
+  </div>
+  <div class="btn-row">
+    <a class="btn" href="{% url 'dashboard:capture_list' %}?node={{ node.code }}">{% translate "All its images" %}</a>
+    <a class="btn" href="{% url 'dashboard:node_edit' node.pk %}">{% translate "Edit" %}</a>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="card kpi">
+    <div class="label">{% translate "Battery" %}</div>
+    <div class="value num">{% if node.battery_voltage %}{{ node.battery_voltage|floatformat:2 }}<small> V</small>{% else %}—{% endif %}</div>
+    <div class="sub">{% if node.battery_voltage and node.battery_voltage < 3.4 %}{% translate "Low — check the solar panel" %}{% else %}{% translate "18650 cell" %}{% endif %}</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">{% translate "Last seen" %}</div>
+    <div class="value" style="font-size:1.2rem">{% if node.last_seen_at %}{% blocktranslate with ago=node.last_seen_at|timesince %}{{ ago }} ago{% endblocktranslate %}{% else %}{% translate "Never connected" %}{% endif %}</div>
+    <div class="sub">{% blocktranslate with count=heartbeat_count %}Heartbeats in 48 h: {{ count }}{% endblocktranslate %}</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">{% translate "Images" %}</div>
+    <div class="value num">{{ stats.total }}</div>
+    <div class="sub">{% blocktranslate with count=stats.done %}Processed: {{ count }}{% endblocktranslate %}{% if stats.failed %} · {% blocktranslate with count=stats.failed %}Failed: {{ count }}{% endblocktranslate %}{% endif %}</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">{% translate "Signal strength" %}</div>
+    <div class="value num">{% if last_heartbeat.rssi is not None %}{{ last_heartbeat.rssi }}<small> dBm</small>{% else %}—{% endif %}</div>
+    <div class="sub">{% translate "At the gateway, last heartbeat" %}</div>
+  </div>
+</div>
+
+<div class="grid grid-main">
+  <div class="stack">
+    <div class="card">
+      <div class="card-head">
+        <h2>{% translate "Latest image and sidewalk zones" %}</h2>
+        <a class="btn small" href="{% url 'dashboard:zone_create' node.pk %}">{% translate "Draw sidewalk zone" %}</a>
+      </div>
+      {% if latest %}
+        {% with image_url=latest_url redacted=latest.redacted_image boxes=None auto_sidewalk=latest_sidewalk %}{% include 'dashboard/partials/viewer.html' %}{% endwith %}
+        <div class="small muted" style="margin-top:8px"><a href="{% url 'dashboard:capture_detail' latest.pk %}">#{{ latest.sequence }}</a> · {{ latest.captured_at|date:'DATETIME_FORMAT' }}</div>
+      {% else %}
+        <p class="empty">{% translate "No image has arrived from this node yet." %}</p>
+      {% endif %}
+
+      {% if zones %}
+        <div class="table-wrap" style="margin-top:14px">
+          <table>
+            <thead><tr><th>{% translate "Zone" %}</th><th>{% translate "Width" %}</th><th>{% translate "Points" %}</th><th>{% translate "Status" %}</th><th></th></tr></thead>
+            <tbody>
+            {% for z in zones %}
+              <tr>
+                <td><b>{{ z.zone.name }}</b></td>
+                <td class="num">{% if z.zone.sidewalk_width_m %}{% blocktranslate with value=z.zone.sidewalk_width_m|floatformat:1 %}{{ value }} m{% endblocktranslate %}{% else %}—{% endif %}</td>
+                <td class="num">{{ z.zone.polygon|length }}</td>
+                <td>{% if z.zone.is_active %}<span class="badge ok">{% translate "Active" %}</span>{% else %}<span class="badge">{% translate "Disabled" %}</span>{% endif %}</td>
+                <td class="btn-row">
+                  <a class="btn small" href="{% url 'dashboard:zone_edit' node.pk z.zone.pk %}">{% translate "Edit" %}</a>
+                  <form method="post" action="{% url 'dashboard:zone_delete' node.pk z.zone.pk %}" data-confirm="{% translate 'Delete this sidewalk zone?' %}">
+                    {% csrf_token %}<button class="btn small danger" type="submit">{% translate "Delete" %}</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="notice" style="margin-top:12px">{% translate "No sidewalk zone yet. Draw one so the system knows which objects are on the sidewalk." %}</div>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Battery, last 48 hours" %}</h2></div>
+      {% if battery_points %}
+        <svg class="battery-chart" viewBox="0 0 600 140" preserveAspectRatio="none" role="img" aria-label="{% translate 'Battery voltage over time' %}">
+          <line class="grid-line" x1="0" x2="600" y1="0" y2="0"/>
+          <line class="grid-line" x1="0" x2="600" y1="70" y2="70"/>
+          <line class="grid-line" x1="0" x2="600" y1="140" y2="140"/>
+          <polyline points="{{ battery_points }}"/>
+        </svg>
+        <div class="small muted" style="display:flex;justify-content:space-between" dir="ltr"><span>{% translate "48 h ago" %}</span><span class="num">3.0 – 4.3 V</span><span>{% translate "Now" %}</span></div>
+      {% else %}
+        <p class="empty">{% translate "No heartbeats in the last 48 hours." %}</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Latest images" %}</h2></div>
+      <div class="strip" style="margin-top:0">
+        {% for c in recent_captures %}
+          <a href="{% url 'dashboard:capture_detail' c.pk %}" title="{{ c.captured_at|date:'SHORT_DATETIME_FORMAT' }}">
+            <img src="{% if c.redacted_image %}{{ c.redacted_image.url }}{% else %}{{ c.image.url }}{% endif %}" alt="" loading="lazy">
+          </a>
+        {% empty %}
+          <p class="muted small">{% translate "No images." %}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Node details" %}</h2></div>
+      <dl class="facts">
+        <dt>{% translate "MAC address" %}</dt><dd class="ltr">{{ node.mac_address|default:'—' }}</dd>
+        <dt>{% translate "Coordinates" %}</dt><dd class="num">{% if node.latitude %}<a href="https://maps.google.com/?q={{ node.latitude }},{{ node.longitude }}" target="_blank" rel="noopener">{{ node.latitude }}, {{ node.longitude }}</a>{% else %}—{% endif %}</dd>
+        <dt>{% translate "Mounting height" %}</dt><dd>{% if node.mount_height_m %}{% blocktranslate with value=node.mount_height_m|floatformat:1 %}{{ value }} m{% endblocktranslate %}{% if node.mount_height_m < 3 %} <span class="badge warn">{% translate "Below 3 m" %}</span>{% endif %}{% else %}—{% endif %}</dd>
+        <dt>{% translate "Installed on" %}</dt><dd>{{ node.installed_at|date:'DATE_FORMAT'|default:'—' }}</dd>
+        <dt>{% translate "Latest image" %}</dt><dd>{{ stats.last|date:'SHORT_DATETIME_FORMAT'|default:'—' }}</dd>
+      </dl>
+      {% if node.notes %}<p class="small" style="white-space:pre-line;margin:12px 0 0">{{ node.notes }}</p>{% endif %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Open violations" %}</h2></div>
+      <ul class="timeline">
+        {% for v in violations %}
+          <li>
+            <span class="score {{ v.impact_score|score_tone }}">{{ v.impact_score|floatformat:0|default:'—' }}</span>
+            <div><a href="{% url 'dashboard:violation_detail' v.pk %}">{{ v.get_category_display }}</a>
+              <div class="when">{{ v.get_status_display }} · {{ v.duration|duration }}</div></div>
+          </li>
+        {% empty %}
+          <li class="muted small">{% translate "No open violations." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

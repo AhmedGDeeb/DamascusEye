@@ -1,0 +1,67 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% translate "Violations" %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Violations" %}</h1>
+    <p>{% translate "Sorted by impact score: blocked width, duration and number of sightings." %}</p>
+  </div>
+</div>
+
+<nav class="tabs">
+  {% for t in tabs %}
+    <a href="{% query status=t.key %}" class="{% if t.key == tab %}active{% endif %}">{{ t.label }}<span class="n num">{{ t.count }}</span></a>
+  {% endfor %}
+</nav>
+
+<form class="filters" method="get" data-autosubmit>
+  <input type="hidden" name="status" value="{{ tab }}">
+  <div class="field">
+    <label for="f-category">{% translate "Type" %}</label>
+    <select name="category" id="f-category">
+      <option value="">{% translate "All types" %}</option>
+      {% for value, label in categories %}<option value="{{ value }}"{% if value == category %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-node">{% translate "Node" %}</label>
+    <select name="node" id="f-node">
+      <option value="">{% translate "All nodes" %}</option>
+      {% for n in nodes %}<option value="{{ n.code }}"{% if n.code == node %} selected{% endif %}>{{ n }}</option>{% endfor %}
+    </select>
+  </div>
+  <noscript><button class="btn" type="submit">{% translate "Filter" %}</button></noscript>
+</form>
+
+<div class="card flush">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th></th><th>#</th><th>{% translate "Type" %}</th><th>{% translate "Node" %}</th><th>{% translate "Impact" %}</th><th>{% translate "First seen" %}</th><th>{% translate "Duration / repeats" %}</th><th>{% translate "Status" %}</th><th>{% translate "Alerts" %}</th></tr>
+      </thead>
+      <tbody>
+      {% for v in page %}
+        <tr>
+          <td>{% with c=v.captures.all|first %}{% if c %}<a href="{% url 'dashboard:violation_detail' v.pk %}"><img class="thumb" src="{% if c.redacted_image %}{{ c.redacted_image.url }}{% else %}{{ c.image.url }}{% endif %}" alt="" loading="lazy"></a>{% endif %}{% endwith %}</td>
+          <td class="num muted">{{ v.pk }}</td>
+          <td><a href="{% url 'dashboard:violation_detail' v.pk %}"><b>{{ v.get_category_display }}</b></a></td>
+          <td>{{ v.node.code }} <span class="muted small">{{ v.node.name }}</span></td>
+          <td><span class="score {{ v.impact_score|score_tone }}">{{ v.impact_score|floatformat:0|default:'—' }}</span></td>
+          <td class="small nowrap">{{ v.first_seen_at|date:'SHORT_DATETIME_FORMAT' }}</td>
+          <td class="small nowrap">{{ v.duration|duration }} · <span class="num">{{ v.repeat_count }}×</span></td>
+          <td><span class="badge {{ v.status|tone }}">{{ v.get_status_display }}</span></td>
+          <td class="num">{{ v.alert_count|default:'—' }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="9" class="empty">{% translate "No violations match this filter." %}<br>
+          <span class="small">{% url 'dashboard:capture_list' as captures_url %}{% blocktranslate %}Violations are recorded from any image under <a href="{{ captures_url }}">Images &amp; detection</a>.{% endblocktranslate %}</span></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% include 'dashboard/partials/pagination.html' %}
+{% endblock %}

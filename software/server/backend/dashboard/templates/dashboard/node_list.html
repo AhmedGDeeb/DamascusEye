@@ -1,0 +1,53 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% translate "Nodes" %}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Nodes" %}</h1>
+    <p>{% translate "Solar camera nodes on the pilot corridor. A node not heard from for 30 minutes shows as offline." %}</p>
+  </div>
+  <a class="btn primary" href="{% url 'dashboard:node_create' %}">{% translate "Add node" %}</a>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <div id="map" data-offline-text="{% translate 'The map could not load (no internet connection).' %}"
+       data-empty-text="{% translate 'Add node coordinates to show them on the map.' %}"></div>
+  {{ map_nodes|json_script:'map-nodes' }}
+</div>
+
+<div class="card flush">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>{% translate "Code" %}</th><th>{% translate "Name" %}</th><th>{% translate "Connection" %}</th><th>{% translate "Battery" %}</th><th>{% translate "Last seen" %}</th><th>{% translate "Images" %}</th><th>{% translate "Open violations" %}</th><th>{% translate "Status" %}</th></tr></thead>
+      <tbody>
+      {% for n in nodes %}
+        <tr>
+          <td><a href="{% url 'dashboard:node_detail' n.pk %}"><b>{{ n.code }}</b></a></td>
+          <td>{{ n.name|default:'—' }}</td>
+          <td>{% if n.is_online %}<span class="badge ok"><i class="dot"></i>{% translate "Online" %}</span>{% else %}<span class="badge danger"><i class="dot"></i>{% translate "Offline" %}</span>{% endif %}</td>
+          <td class="num">{% if n.battery_voltage %}{{ n.battery_voltage|floatformat:2 }} V{% else %}—{% endif %}</td>
+          <td class="small">{% if n.last_seen_at %}{% blocktranslate with ago=n.last_seen_at|timesince %}{{ ago }} ago{% endblocktranslate %}{% else %}{% translate "Never connected" %}{% endif %}</td>
+          <td class="num">{{ n.capture_count }}</td>
+          <td class="num">{{ n.open_violations|default:'—' }}</td>
+          <td><span class="badge {{ n.status|tone }}">{{ n.get_status_display }}</span></td>
+        </tr>
+      {% empty %}
+        {% url 'dashboard:node_create' as create_url %}
+        <tr><td colspan="8" class="empty">{% blocktranslate %}No nodes yet. <a href="{{ create_url }}">Add the first node</a> with the same code the firmware sends.{% endblocktranslate %}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% translate "Overview" %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Overview" %}</h1>
+    <p>{% translate "Network status, violations and field-pilot results." %}</p>
+  </div>
+  <div class="btn-row">
+    {% if awaiting_review %}<a class="btn primary" href="{% url 'dashboard:violation_list' %}?status=detected">{% blocktranslate with count=awaiting_review %}Review {{ count }} violations{% endblocktranslate %}</a>{% endif %}
+    <a class="btn" href="{% url 'dashboard:hotspots' %}">{% translate "Weekly list" %}</a>
+  </div>
+</div>
+
+<div class="kpis">
+  <div class="card kpi{% if offline_nodes %} alert{% endif %}">
+    <div class="label">{% translate "Nodes online" %}</div>
+    <div class="value num">{{ nodes_online }}<small> / {{ nodes_total }}</small></div>
+    <div class="sub">{% if offline_nodes %}{% blocktranslate with count=offline_nodes|length %}Offline: {{ count }} — check on site{% endblocktranslate %}{% else %}{% translate "All nodes are running" %}{% endif %}</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">{% translate "Images today" %}</div>
+    <div class="value num">{{ captures_today }}</div>
+    <div class="sub">{% blocktranslate with count=queue_pending %}In detection queue: {{ count }}{% endblocktranslate %}{% if queue_failed %} · {% blocktranslate with count=queue_failed %}Failed: {{ count }}{% endblocktranslate %}{% endif %}</div>
+  </div>
+  <div class="card kpi{% if awaiting_review %} alert{% endif %}">
+    <div class="label">{% translate "Awaiting review" %}</div>
+    <div class="value num">{{ awaiting_review }}</div>
+    <div class="sub">{% translate "Violations needing a reviewer's decision" %}</div>
+  </div>
+  <div class="card kpi">
+    <div class="label">{% translate "Confirmed, not alerted" %}</div>
+    <div class="value num">{{ confirmed_not_alerted }}</div>
+    <div class="sub">{% translate "Ready to send to the inspectors" %}</div>
+  </div>
+</div>
+
+<div class="grid grid-main">
+  <div class="stack">
+    <div class="card flush">
+      <div class="card-head">
+        <h2>{% translate "Highest-impact open violations" %}</h2>
+        <a class="small" href="{% url 'dashboard:violation_list' %}">{% translate "View all" %}</a>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>{% translate "Type" %}</th><th>{% translate "Node" %}</th><th>{% translate "Impact" %}</th><th>{% translate "Duration" %}</th><th>{% translate "Status" %}</th></tr></thead>
+          <tbody>
+          {% for v in top_violations %}
+            <tr>
+              <td>{% with c=v.captures.all|first %}{% if c %}<a href="{% url 'dashboard:violation_detail' v.pk %}"><img class="thumb" src="{% if c.redacted_image %}{{ c.redacted_image.url }}{% else %}{{ c.image.url }}{% endif %}" alt=""></a>{% endif %}{% endwith %}</td>
+              <td><a href="{% url 'dashboard:violation_detail' v.pk %}">{{ v.get_category_display }}</a></td>
+              <td>{{ v.node.code }} <span class="muted small">{{ v.node.name }}</span></td>
+              <td><span class="score {{ v.impact_score|score_tone }}">{{ v.impact_score|floatformat:0|default:'—' }}</span></td>
+              <td class="small nowrap">{{ v.duration|duration }} · <span class="num">{{ v.repeat_count }}×</span></td>
+              <td><span class="badge {{ v.status|tone }}">{{ v.get_status_display }}</span></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="empty">{% translate "No open violations." %}</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card">
+        <div class="card-head"><h2>{% translate "Images, last 7 days" %}</h2></div>
+        <div class="bars">
+          {% for b in daily_bars %}
+            <div class="bar" title="{{ b.day|date:'l' }} {{ b.day|date:'MONTH_DAY_FORMAT' }}: {{ b.count }}">
+              <div class="fill" style="height:{{ b.height|stringformat:'.1f' }}%"><b class="num">{{ b.count }}</b></div>
+              <small>{{ b.day|date:'D' }}</small>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>{% translate "Encroachment types (7 days)" %}</h2></div>
+        <div class="hbars">
+          {% for c in category_bars %}
+            <div class="hbar">
+              <div class="row"><span>{{ c.label }}</span><b class="num">{{ c.count }}</b></div>
+              <div class="track"><span style="width:{{ c.width|stringformat:'.1f' }}%"></span></div>
+            </div>
+          {% empty %}
+            <p class="empty">{% translate "No data yet." %}</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>{% translate "Latest images" %}</h2>
+        <a class="small" href="{% url 'dashboard:capture_list' %}">{% translate "All images" %}</a>
+      </div>
+      <div class="capture-grid">
+        {% for c in recent_captures %}
+          <a class="card capture-card" href="{% url 'dashboard:capture_detail' c.pk %}">
+            <img src="{% if c.redacted_image %}{{ c.redacted_image.url }}{% else %}{{ c.image.url }}{% endif %}" alt="" loading="lazy">
+            <div class="meta">
+              <div class="row"><b>{{ c.node.code }}</b><span class="badge {{ c.status|tone }}">{{ c.get_status_display }}</span></div>
+              <span class="muted small">{{ c.captured_at|date:'SHORT_DATETIME_FORMAT' }}</span>
+            </div>
+          </a>
+        {% empty %}
+          <p class="empty">{% translate "No images have arrived yet. Check that the gateway bridge is running." %}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Pilot decision" %}</h2><span class="hint">{% translate "Last 14 days" %}</span></div>
+      {% include 'dashboard/partials/metrics.html' %}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Offline nodes" %}</h2></div>
+      {% if offline_nodes %}
+        <ul class="timeline">
+          {% for n in offline_nodes %}
+            <li>
+              <span class="badge danger"><i class="dot"></i></span>
+              <div>
+                <a href="{% url 'dashboard:node_detail' n.pk %}"><b>{{ n.code }}</b> {{ n.name }}</a>
+                <div class="when">{% if n.last_seen_at %}{% blocktranslate with ago=n.last_seen_at|timesince %}Last seen {{ ago }} ago{% endblocktranslate %}{% else %}{% translate "Never connected" %}{% endif %}</div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted small" style="margin:0">{% translate "No offline nodes." %}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

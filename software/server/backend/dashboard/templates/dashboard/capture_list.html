@@ -1,0 +1,52 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{% translate "Images & detection" %}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>{% translate "Images & detection" %}</h1>
+    <p>{% translate "Every image received from the nodes, with the result of the latest YOLO run." %}</p>
+  </div>
+  {% if live %}
+    <span class="live-badge" id="live-badge" role="status"
+          data-label-live="{% translate 'Live' %}"
+          data-label-new="{% translate 'new' %}"
+          data-label-offline="{% translate 'Live updates paused — reconnecting…' %}"
+          data-label-login="{% translate 'Session expired — reload the page' %}"><i class="dot"></i><span>{% translate "Live" %}</span></span>
+  {% endif %}
+</div>
+
+<form class="filters" method="get" data-autosubmit>
+  <div class="field">
+    <label for="f-status">{% translate "Detection status" %}</label>
+    <select name="status" id="f-status">
+      <option value="">{% translate "All" %}</option>
+      {% for value, label in statuses %}<option value="{{ value }}"{% if value == status %} selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-node">{% translate "Node" %}</label>
+    <select name="node" id="f-node">
+      <option value="">{% translate "All nodes" %}</option>
+      {% for n in nodes %}<option value="{{ n.code }}"{% if n.code == node %} selected{% endif %}>{{ n }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-date">{% translate "Date" %}</label>
+    <input type="date" name="date" id="f-date" value="{{ date }}">
+  </div>
+  {% if status or node or date %}<a class="btn small" href="?">{% translate "Clear filters" %}</a>{% endif %}
+  <noscript><button class="btn" type="submit">{% translate "Filter" %}</button></noscript>
+</form>
+
+<div class="capture-grid" id="capture-grid"{% if live %} data-feed-url="{{ feed_url }}" data-latest-id="{{ latest_id }}" data-poll="5000"{% endif %}>
+  {% for card in cards %}
+    {% include 'dashboard/partials/capture_card.html' %}
+  {% empty %}
+    <div class="card empty" style="grid-column:1/-1" data-empty>{% translate "No images match this filter." %}</div>
+  {% endfor %}
+</div>
+{% include 'dashboard/partials/pagination.html' %}
+{% endblock %}

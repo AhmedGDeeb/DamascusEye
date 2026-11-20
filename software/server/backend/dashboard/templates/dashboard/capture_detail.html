@@ -1,0 +1,116 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n dashboard_tags %}
+
+{% block title %}{{ capture.node.code }} #{{ capture.sequence }}{% endblock %}
+
+{% block content %}
+{% get_current_language_bidi as rtl %}
+<div class="page-head">
+  <div>
+    <div class="crumbs"><a href="{% url 'dashboard:capture_list' %}">{% translate "Images & detection" %}</a> / <a href="{% url 'dashboard:node_detail' capture.node.pk %}">{{ capture.node.code }}</a> / #{{ capture.sequence }}</div>
+    <h1>{{ capture.captured_at|date:'DATETIME_FORMAT' }}</h1>
+    <p><span class="badge {{ capture.status|tone }}">{{ capture.get_status_display }}</span>
+      {% if on_sidewalk_count %}<span class="badge danger">{% blocktranslate with count=on_sidewalk_count %}{{ count }} on sidewalk{% endblocktranslate %}</span>{% endif %}</p>
+  </div>
+  <div class="btn-row">
+    {% if previous %}<a class="btn" href="{% url 'dashboard:capture_detail' previous.pk %}">{% if rtl %}→{% else %}←{% endif %} {% translate "Older" %}</a>{% endif %}
+    {% if next %}<a class="btn" href="{% url 'dashboard:capture_detail' next.pk %}">{% translate "Newer" %} {% if rtl %}←{% else %}→{% endif %}</a>{% endif %}
+  </div>
+</div>
+
+<div class="grid grid-main">
+  <div class="stack">
+    <div class="card">
+      {% if runs|length > 1 %}
+        <nav class="tabs" style="margin-top:-6px">
+          {% for r in runs %}
+            <a href="?run={{ r.pk }}" class="{% if r.pk == run.pk %}active{% endif %} ltr">{{ r.model_name }}{% if r.sidewalk_model %} · {{ r.sidewalk_model }}{% endif %}<span class="n">{{ r.detections.all|length }}</span></a>
+          {% endfor %}
+        </nav>
+      {% endif %}
+      {% include 'dashboard/partials/viewer.html' %}
+      {% if not zones and not auto_sidewalk %}
+        {% url 'dashboard:zone_create' capture.node.pk as zone_url %}
+        <div class="notice" style="margin-top:12px">{% blocktranslate %}No sidewalk zone has been drawn for this node, so the system cannot tell which objects are on the sidewalk. <a href="{{ zone_url }}">Draw it now</a>.{% endblocktranslate %}</div>
+      {% endif %}
+    </div>
+
+    <div class="card flush">
+      <div class="card-head">
+        <h2>{% translate "Detection results" %}</h2>
+        {% if run %}<span class="hint ltr">{{ run.model_name }}{% if run.model_version %} {{ run.model_version }}{% endif %}{% if run.inference_ms %} · {{ run.inference_ms|floatformat:0 }} ms{% endif %}</span>{% endif %}
+      </div>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>{% translate "Class" %}</th><th>{% translate "Confidence" %}</th><th>{% translate "Location" %}</th><th>{% translate "Box (x1, y1, x2, y2)" %}</th></tr></thead>
+          <tbody>
+          {% for b in boxes %}
+            <tr>
+              <td class="ltr" style="text-align:start"><b>{{ b.detection.class_name }}</b></td>
+              <td class="num">{{ b.detection.confidence|floatformat:2 }}</td>
+              <td>{% if b.on_sidewalk %}<span class="badge danger">{% translate "On the sidewalk" %}</span>{% else %}<span class="badge">{% translate "Off the sidewalk" %}</span>{% endif %}</td>
+              <td class="num small muted">{{ b.detection.x1|floatformat:3 }}, {{ b.detection.y1|floatformat:3 }}, {{ b.detection.x2|floatformat:3 }}, {{ b.detection.y2|floatformat:3 }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="empty">
+              {% if capture.status == 'done' %}{% translate "The model detected no objects." %}
+              {% elif capture.status == 'failed' %}{% blocktranslate with error=capture.error %}Detection failed: {{ error }}{% endblocktranslate %}
+              {% else %}{% translate "The image is in the detection queue; results appear once the YOLO manager processes it." %}{% endif %}
+            </td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="stack">
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Record a violation" %}</h2></div>
+      <form method="post" class="form-grid">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="error">{{ field.errors|join:' ' }}</div>{% endif %}
+          </div>
+        {% endfor %}
+        {% if form.occupancy_ratio.initial %}<p class="small muted" style="margin:0">{% translate "Occupancy is suggested from the detection boxes and may be higher than the real value." %}</p>{% endif %}
+        <button class="btn primary" type="submit">{% translate "Record violation" %}</button>
+        <p class="small muted" style="margin:0">{% translate "If this node already has an open violation of the same type from the last 12 hours, the image is added to it instead of creating a new one." %}</p>
+      </form>
+    </div>
+
+    {% if violations %}
+      <div class="card">
+        <div class="card-head"><h2>{% translate "Linked violations" %}</h2></div>
+        <ul class="timeline">
+          {% for v in violations %}
+            <li><span class="badge {{ v.status|tone }}">{{ v.get_status_display }}</span>
+              <a href="{% url 'dashboard:violation_detail' v.pk %}">{{ v.get_category_display }} #{{ v.pk }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-head"><h2>{% translate "Image details" %}</h2></div>
+      <dl class="facts">
+        <dt>{% translate "Node" %}</dt><dd><a href="{% url 'dashboard:node_detail' capture.node.pk %}">{{ capture.node }}</a></dd>
+        <dt>{% translate "Frame number" %}</dt><dd class="num">{{ capture.sequence }}</dd>
+        <dt>{% translate "Captured" %}</dt><dd>{{ capture.captured_at|date:'DATE_FORMAT' }} <span class="num">{{ capture.captured_at|time:'H:i:s' }}</span></dd>
+        <dt>{% translate "Received" %}</dt><dd>{{ capture.received_at|date:'DATE_FORMAT' }} <span class="num">{{ capture.received_at|time:'H:i:s' }}</span></dd>
+        <dt>{% translate "Dimensions" %}</dt><dd class="num">{% if capture.width %}{{ capture.width }}×{{ capture.height }}{% else %}—{% endif %}</dd>
+        <dt>{% translate "Detection attempts" %}</dt><dd class="num">{{ capture.attempts }}</dd>
+        {% if capture.error %}<dt>{% translate "Error" %}</dt><dd style="color:var(--danger)">{{ capture.error }}</dd>{% endif %}
+      </dl>
+      {% if capture.status == 'failed' or capture.status == 'done' %}
+        <form method="post" action="{% url 'dashboard:capture_requeue' capture.pk %}" style="margin-top:14px">
+          {% csrf_token %}<button class="btn small" type="submit">{% translate "Run detection again" %}</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
